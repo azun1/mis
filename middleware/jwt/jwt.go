@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// JWT jwt验证中间件
 func JWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var code int
@@ -23,6 +24,8 @@ func JWT() gin.HandlerFunc {
 				code = e.ERROR_AUTH_CHECK_TOKEN_FAIL
 			} else if time.Now().Unix() > claims.ExpiresAt {
 				code = e.ERROR_AUTH_CHECK_TOKEN_TIMEOUT
+			} else {
+				c.Set("username", claims.Username) // 后续接口处理可直接通过c.Get(key)获取用户信息
 			}
 		}
 
