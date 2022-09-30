@@ -2,3 +2,5 @@
 /conf/app.ini
 # 忽略日志目录
 /runtime
+.DS_Store
+main
