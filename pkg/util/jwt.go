@@ -4,10 +4,10 @@ import (
 	"MIS/pkg/settings"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 )
 
-var jwtSecret = []byte(settings.JwtSecret)
+var jwtSecret = []byte(settings.AppSettings.JwtSecret)
 
 type Claims struct {
 	Username string `json:"username"`
@@ -15,16 +15,17 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+// GenerateToken 生成jwt token
 func GenerateToken(username, password string) (string, error) {
 	nowTime := time.Now()
-	expireTime := nowTime.Add(3 * time.Hour)
+	expireTime := nowTime.Add(3 * time.Hour) // token过期时间3h
 
 	claims := Claims{
 		username,
 		password,
 		jwt.StandardClaims{
-			ExpiresAt: expireTime.Unix(),   // 过期时间
-			Issuer:    "gin-petSystemTest", // 签发人
+			ExpiresAt: expireTime.Unix(), // 过期时间
+			Issuer:    "Mis",             // 签发人
 		},
 	}
 
@@ -34,6 +35,7 @@ func GenerateToken(username, password string) (string, error) {
 	return token, err
 }
 
+// ParseToken 解析jwt token
 func ParseToken(token string) (*Claims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil

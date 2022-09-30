@@ -1,0 +1,8 @@
+# 忽略配置文件
+/conf/app.ini
+# 忽略日志目录
+/runtime
+# 忽略一些其他文件
+.idea
+.DS_Store
+main
