@@ -6,9 +6,10 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-ini/ini v1.67.0
+	github.com/google/uuid v1.3.0
 	github.com/unknwon/com v1.0.1
-	gorm.io/driver/mysql v1.3.6
-	gorm.io/gorm v1.23.10
+	gorm.io/driver/mysql v1.4.3
+	gorm.io/gorm v1.24.0
 )
 
 require (

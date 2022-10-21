@@ -20,6 +20,7 @@ type Server struct {
 }
 
 type DataBase struct {
+	Type        string
 	User        string
 	Password    string
 	Host        string
