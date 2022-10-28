@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 	"log"
 )
 
@@ -20,7 +21,12 @@ func init() {
 		settings.DataBaseSettings.Host,
 		settings.DataBaseSettings.Name)
 	var err error
-	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{PrepareStmt: true})
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		PrepareStmt: true,
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
+	})
 	if err != nil {
 		log.Fatal(2, "连接数据库失败: %v", err)
 	}

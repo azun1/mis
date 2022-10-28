@@ -46,7 +46,7 @@ var AliyunSettings = &AliyunSetting{}
 
 func init() {
 	var err error
-	Conf, err = ini.Load("conf/app.ini")
+	Conf, err = ini.Load("conf/app-example.ini")
 	if err != nil {
 		log.Fatalf("setting.go, 读取项目配置文件 'app.ini'失败: %v", err)
 	}
