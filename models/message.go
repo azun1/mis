@@ -14,7 +14,7 @@ const (
 	Text
 )
 const (
-	User SenderType = iota
+	Common SenderType = iota // 此处原来的User与User表结构体名冲突，更改为Common
 	Admin
 	System
 )
@@ -89,7 +89,7 @@ func DelMessageRecord(userId, targetId string, createTime time.Time) error {
 //		SenderUId:   "1",
 //		MessageType: Text,
 //		Message:     "hello this is a test message.",
-//		SenderType:  User,
+//		SenderType:  Common,
 //		TargetUId:   "1",
 //	}
 //	db.Save(&messageRecord)
