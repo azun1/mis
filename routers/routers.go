@@ -17,8 +17,8 @@ func RoutesController() *gin.Engine {
 	// v1版本路由
 	Apiv1 = Engine.Group("api/v1")
 	{
-		AuthcRouter()
 		MessageRouter()
+		UserRouter()
 	}
 
 	return Engine
