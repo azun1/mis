@@ -10,19 +10,17 @@ import (
 var jwtSecret = []byte(settings.AppSettings.JwtSecret)
 
 type Claims struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	UserUuid string `json:"userUuid"`
 	jwt.StandardClaims
 }
 
 // GenerateToken 生成jwt token
-func GenerateToken(username, password string) (string, error) {
+func GenerateToken(uuid string) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(3 * time.Hour) // token过期时间3h
 
 	claims := Claims{
-		username,
-		password,
+		uuid,
 		jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(), // 过期时间
 			Issuer:    "Mis",             // 签发人

@@ -9,6 +9,18 @@ import (
 
 var Conf *ini.File
 
+type UserType int // 用户类型
+
+const (
+	None UserType = iota
+	Common
+	Administrator
+)
+
+func (u UserType) Int() int {
+	return int(u)
+}
+
 type App struct {
 	PageSize  int
 	JwtSecret string
@@ -46,7 +58,7 @@ var AliyunSettings = &AliyunSetting{}
 
 func init() {
 	var err error
-	Conf, err = ini.Load("conf/app-example.ini")
+	Conf, err = ini.Load("conf/app.ini")
 	if err != nil {
 		log.Fatalf("setting.go, 读取项目配置文件 'app.ini'失败: %v", err)
 	}
