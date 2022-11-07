@@ -144,13 +144,13 @@ func (u *User) GetRelatedAccount(targetUuid string, info *[]string) error {
 }
 
 // SetRelatedAccount 设置某个已关联账号的信息(关系类型, 备注)
-func (u *User) SetRelatedAccount(targetUuid, urType, urInfo string) error {
+func (u *User) SetRelatedAccount(targetUuid string, info *[]string) error {
 	relationship := UserRelationship{}
 	res := db.Where("selfUuid = ? AND Family_uuid = ?",
 		u.Uuid, targetUuid).Take(&relationship)
 	// 更新字段的值
-	relationship.RelationshipType = urType
-	relationship.RelationshipInfo = urInfo
+	relationship.RelationshipType = (*info)[0]
+	relationship.RelationshipInfo = (*info)[1]
 	res = db.Save(&relationship)
 	if res != nil {
 		logging.Error(res.Error)
