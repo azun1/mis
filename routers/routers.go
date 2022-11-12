@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"MIS/middleware"
 	"MIS/pkg/settings"
 	"github.com/gin-gonic/gin"
 )
@@ -11,6 +12,7 @@ var Apiv1 *gin.RouterGroup
 
 func RoutesController() *gin.Engine {
 	Engine = gin.Default()
+	Engine.Use(middleware.AllowAll())
 	// 设置gin的工作模式
 	gin.SetMode(settings.ServerSettings.RunMode)
 
