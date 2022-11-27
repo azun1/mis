@@ -10,8 +10,8 @@ type MessageType int
 type SenderType int
 
 const (
-	Image MessageType = iota
-	Text
+	Text MessageType = iota
+	Image
 )
 const (
 	Common SenderType = iota // 此处原来的User与User表结构体名冲突，更改为Common
@@ -23,15 +23,14 @@ type MessageRecord struct {
 	gorm.Model
 	SenderUId string
 	MessageType
-	Message string
-	SenderType
+	Content   string
 	TargetUId string
 }
 
 type SystemNotice struct {
 	gorm.Model
 	SenderType
-	Message string
+	Content string
 	MessageType
 	TargetUId string
 }
@@ -68,7 +67,7 @@ func GetMessageDetailByType(messageType int) ([]string, error) {
 	}
 	result := make([]string, 0)
 	for i := 0; i < len(messageRecords); i++ {
-		result = append(result, messageRecords[i].Message)
+		result = append(result, messageRecords[i].Content)
 	}
 	return result, nil
 }
@@ -83,47 +82,11 @@ func DelMessageRecord(userId, targetId string, createTime time.Time) error {
 	return nil
 }
 
-//func SaveMessageRecordForTest() {
-//	messageRecord := MessageRecord{
-//		Model:       gorm.Model{},
-//		SenderUId:   "1",
-//		MessageType: Text,
-//		Message:     "hello this is a test message.",
-//		SenderType:  Common,
-//		TargetUId:   "1",
-//	}
-//	db.Save(&messageRecord)
-//}
-
-//type GenderType string
-//
-//type MedicalRecord struct {
-//	//Sex               GenderType   `json:"sex"`
-//	Weight            float64 `json:"weight"`
-//	Height            float64 `json:"height"`
-//	Age               int     `json:"age"`
-//	UnderlyingDisease string  `json:"underlying_disease"`
-//}
-//
-//func GetMedicalRecordById(id int64) (medicalRecord []MedicalRecord, err error) {
-//	err = db.Where("u_uuid = ?", id).Find(&medicalRecord).Error
-//	if err != nil {
-//		logging.Info("Unexpected error occurred when get medical records by field")
-//	}
-//	return
-//}
-//
-//func GetMedicalRecordList() (medicalRecord []MedicalRecord, err error) {
-//	err = db.Find(&medicalRecord).Error
-//	if err != nil {
-//		logging.Info("Unexpected error occurred when get medical records")
-//	}
-//	return
-//}
-//func DeleteMedicalRecordById(id int64) (err error) {
-//	err = db.Where("u_uuid = ?", id).Delete(&MedicalRecord{}).Error
-//	if err != nil {
-//		logging.Info("Unexpected error occurred when delete medical records by uuid")
-//	}
-//	return
-//}
+func SaveMessageRecord(record MessageRecord) error {
+	err := db.Create(&record).Error
+	if err != nil {
+		logging.Info(err)
+		return err
+	}
+	return nil
+}
