@@ -21,6 +21,8 @@ func RoutesController() *gin.Engine {
 	{
 		MessageRouter()
 		UserRouter()
+		UserRelationshipRouter()
+		WaveformInfoRouter()
 	}
 
 	return Engine

@@ -14,7 +14,7 @@ type UserRelationship struct {
 	FamilyUuid       string `json:"family_uuid" gorm:"default:'';not null;uniqueIndex:s&f_uuid_index,priority:2;uniqueIndex:f&s_uuid_index,priority:1"`
 	RelationshipType string `json:"relationship_type" gorm:"default:'';not null"`
 	RelationshipInfo string `json:"relationship_info" gorm:"default:'';not null"`
-	IsConfirmed      bool   `json:"is_confirmed" gorm:"type:tinyint(1);default:0"`
+	IsConfirmed      bool   `json:"is_confirmed" gorm:"type:tinyint(1);default:0;not null"`
 }
 
 // createNewRecord 创建一行新的账号关联申请

@@ -45,4 +45,12 @@ func init() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	err = db.AutoMigrate(&UserRelationship{})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = db.AutoMigrate(&WaveformInfo{})
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
