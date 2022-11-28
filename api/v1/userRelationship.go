@@ -24,6 +24,7 @@ func RequestConnect(c *gin.Context) {
 	// 基于输入的email / username 查找对应用户
 	var user = api.CurrentUser(c)
 	var userSelectForm struct {
+		// 搜索依据
 		Basis string `json:"basis" validate:"required"`
 	}
 	if !util.BindAndValid(c, &userSelectForm) {
