@@ -3,7 +3,6 @@ package models
 import (
 	"MIS/pkg/logging"
 	"encoding/csv"
-	"encoding/json"
 	"errors"
 	"gorm.io/gorm"
 	"io"
@@ -24,13 +23,13 @@ type WaveformInfo struct {
 }
 
 type Description struct {
-	WaveformType string `json:"waveform_type"`
-	TimeStart    string `json:"time_start"`
-	TimeEnd      string `json:"time_end"`
-	ValuesMin    string `json:"values_min"`
-	ValuesMax    string `json:"values_max"`
-	X            []byte `json:"x"`
-	Y            []byte `json:"y"`
+	WaveformType string   `json:"waveform_type"`
+	TimeStart    string   `json:"time_start"`
+	TimeEnd      string   `json:"time_end"`
+	ValuesMin    string   `json:"values_min"`
+	ValuesMax    string   `json:"values_max"`
+	X            []string `json:"x"`
+	Y            []string `json:"y"`
 }
 
 // CreateNewRecord 对外接口, 传感器上传数据的时候触发
@@ -50,8 +49,6 @@ func ReadByLine(fp string, data *[][]string, n ...int) error {
 	// TODO: defer关闭文件时出错的处理程序
 	defer file.Close()
 
-	// 调用三方库读取CSV文件方法: https://www.smarty.com/blog/2018/01/csv-scanning-in-go
-	// 库文档: https://pkg.go.dev/github.com/smartystreets/scanners/csv#NewScanner
 	reader := csv.NewReader(file)
 	// 设置每行数据里面的字段数量
 	// 如果FieldsPerRecord的值为正数, 并且CSV文件里面读取出的字段数量少于这个值时, Go就会抛出一个错误
@@ -98,7 +95,8 @@ func ReadByLine(fp string, data *[][]string, n ...int) error {
 			}
 			csvData = record // 引用赋值
 		}
-		*data = append(*data, csvData)
+		// 忽略行首序号
+		*data = append(*data, csvData[1:])
 	}
 	return nil
 }
@@ -148,35 +146,36 @@ func RowsToJSON(desc *Description, data *[][]string) (err error) {
 	dur := et.Sub(st)
 	// Duration类型只能和int64, float64, string转换
 	var xLng int64 = int64(len((*data)[0]))
-	// 最小时隙(用int64格式存储)
+	// 最小时隙(用int6[]string
 	gap := int64(dur) / xLng
 	x := make([]time.Time, 0, xLng)
-	for i := range x {
-		x[i] = st
-		x[i].Add(time.Duration(int64(i) * gap))
+	desc.X = make([]string, 0, xLng)
+	for i := 0; i < cap(x); i++ {
+		x = append(x, st)
+		x[i] = x[i].Add(time.Duration(int64(i) * gap))
+		// .000 精确到毫秒
+		desc.X = append(desc.X, x[i].Format("2006-01-02 15:04:05.000"))
 	}
-	desc.X, err = json.Marshal(x)
 
 	// Y轴处理
 	var yLng int
 	for i := range *data {
 		yLng += len((*data)[i])
 	}
-	y := make([]string, 0, yLng)
+	desc.Y = make([]string, 0, yLng)
 	for i := range *data {
-		y = append(y, (*data)[i]...)
+		desc.Y = append(desc.Y, (*data)[i]...)
 	}
-	desc.Y, err = json.Marshal(y)
 
 	// 找出Y轴最值
-	maxV := y[0]
-	minV := y[1]
-	for i := range y {
-		if strings.Compare(y[i], maxV) > 0 {
-			maxV = y[i]
+	maxV := desc.Y[0]
+	minV := desc.Y[1]
+	for i := range desc.Y {
+		if strings.Compare(desc.Y[i], maxV) > 0 {
+			maxV = desc.Y[i]
 		}
-		if strings.Compare(y[i], minV) < 0 {
-			minV = y[i]
+		if strings.Compare(desc.Y[i], minV) < 0 {
+			minV = desc.Y[i]
 		}
 	}
 
