@@ -166,3 +166,14 @@ func Delete(context *gin.Context) {
 		"mesg": "注销成功",
 	})
 }
+
+// GetUserInfo 获取用户信息
+func GetUserInfo(context *gin.Context) {
+	user := api.CurrentUser(context)
+
+	context.JSON(http.StatusOK, gin.H{
+		"code": http.StatusOK,
+		"mesg": "获取用户信息成功",
+		"data": user,
+	})
+}
