@@ -8,6 +8,7 @@ func MessageRouter() {
 		messages.GET("/getList", v1.GetMessageList)
 		messages.GET("/getClass", v1.GetMessageByType)
 		messages.GET("/getDetail", v1.GetMessageDetailByType)
+		messages.POST("/save", v1.SaveRecord)
 		messages.DELETE("/delete", v1.DelMessageRecord)
 	}
 }

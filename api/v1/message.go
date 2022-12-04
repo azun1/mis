@@ -4,7 +4,9 @@ import (
 	"MIS/models"
 	"MIS/pkg/e"
 	"MIS/pkg/logging"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 	"time"
@@ -25,15 +27,20 @@ type Response struct {
 	StatusMsg  string `json:"status_msg,omitempty"`
 }
 
-//type RecordDetailResponse struct {
-//	Response
-//	models.MedicalRecord
-//}
-
 func GetMessageList(c *gin.Context) {
-	userId := c.Query("user_id")
-	targetId := c.Query("target_id")
-	result, err := models.GetMessageList(userId, targetId)
+	var MessageListForm struct {
+		UserId   string `json:"user_id"`
+		TargetId string `json:"target_id"`
+	}
+	err := c.ShouldBind(&MessageListForm)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, Response{
+			StatusCode: http.StatusInternalServerError,
+			StatusMsg:  "invalid request param!",
+		})
+		return
+	}
+	result, err := models.GetMessageList(MessageListForm.UserId, MessageListForm.TargetId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, Response{
 			StatusCode: http.StatusInternalServerError,
@@ -53,8 +60,11 @@ func GetMessageList(c *gin.Context) {
 }
 
 func GetMessageByType(c *gin.Context) {
-	messageType := c.Query("message_type")
-	typeParam, err := strconv.Atoi(messageType)
+	var TypeForm struct {
+		MessageType string `json:"message_type"`
+	}
+	err := c.ShouldBindJSON(&TypeForm)
+	typeParam, err := strconv.Atoi(TypeForm.MessageType)
 	if err != nil {
 		logging.Info(err)
 		return
@@ -75,8 +85,11 @@ func GetMessageByType(c *gin.Context) {
 }
 
 func GetMessageDetailByType(c *gin.Context) {
-	messageType := c.Query("message_type")
-	typeParam, err := strconv.Atoi(messageType)
+	var TypeForm struct {
+		Type string `json:"message_type"`
+	}
+	err := c.ShouldBindJSON(&TypeForm)
+	typeParam, err := strconv.Atoi(TypeForm.Type)
 	if err != nil {
 		logging.Info(err)
 	}
@@ -90,16 +103,20 @@ func GetMessageDetailByType(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, MessageListResponse{
-		Response:    Response{200, "Get records by message type successfully."},
+		Response:    Response{200, "Get MessageDetail by message type successfully."},
 		MessageList: result,
 	})
 }
 
 func DelMessageRecord(c *gin.Context) {
-	userId := c.Query("user_id")
-	targetId := c.Query("target_id")
-	createTime := c.Query("created_at")
-	createAt, err := time.Parse("2006-01-02 15:04:05", createTime)
+	var DelMessageForm struct {
+		UserId     string `json:"user_id" validate:"required"`
+		TargetId   string `json:"target_id" validate:"required"`
+		CreateTime string `json:"created_at" validate:"required"`
+	}
+	err := c.ShouldBindJSON(&DelMessageForm)
+	fmt.Printf("%+v", DelMessageForm)
+	createAt, err := time.Parse("2006-01-02 15:04:05", DelMessageForm.CreateTime)
 	if err != nil {
 		logging.Info(err)
 		c.JSON(http.StatusInternalServerError, Response{
@@ -108,7 +125,7 @@ func DelMessageRecord(c *gin.Context) {
 		})
 		return
 	}
-	err = models.DelMessageRecord(userId, targetId, createAt)
+	err = models.DelMessageRecord(DelMessageForm.UserId, DelMessageForm.TargetId, createAt)
 	if err != nil {
 		logging.Info(err)
 		c.JSON(http.StatusInternalServerError, Response{
@@ -123,56 +140,49 @@ func DelMessageRecord(c *gin.Context) {
 	})
 }
 
-//type RecordResponse struct {
-//	Response
-//	ResponseList []models.MedicalRecord
-//}
-//
-//func GetRecordList(c *gin.Context) {
-//
-//	result, err := models.GetMedicalRecordList()
-//	if err != nil {
-//		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "database error!"})
-//		return
-//	}
-//
-//	c.JSON(http.StatusOK, RecordResponse{
-//		Response:     Response{StatusCode: 0},
-//		ResponseList: result,
-//	})
-//}
-//
-//func GetDetail(c *gin.Context) {
-//	id := c.Query("user_id")
-//	uuid, err := strconv.ParseInt(id, 10, 64)
-//	if err != nil {
-//		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "uuid error!"})
-//		return
-//	}
-//	result, err := models.GetMedicalRecordById(uuid)
-//	if err != nil {
-//		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "database error!"})
-//		return
-//	}
-//	c.JSON(http.StatusOK, RecordResponse{
-//		Response:     Response{StatusCode: 0},
-//		ResponseList: result,
-//	})
-//}
-//
-//func DeleteRecord(c *gin.Context) {
-//	id := c.Query("user_id")
-//	uuid, err := strconv.ParseInt(id, 10, 64)
-//	if err != nil {
-//		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "uuid error!"})
-//		return
-//	}
-//	err = models.DeleteMedicalRecordById(uuid)
-//	if err != nil {
-//		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "database error!"})
-//		return
-//	}
-//	c.JSON(http.StatusOK, RecordResponse{
-//		Response: Response{StatusCode: 0},
-//	})
-//}
+func SaveRecord(c *gin.Context) {
+	var SaveForm struct {
+		UserId      string `json:"user_id"`
+		TargetId    string `json:"target_id"`
+		Content     string `json:"content"`
+		MessageType string `json:"message_type"`
+	}
+	err := c.ShouldBindJSON(&SaveForm)
+	if err != nil {
+		logging.Info(err)
+		return
+	}
+	Type, _ := strconv.Atoi(SaveForm.MessageType)
+	var RecordType models.MessageType
+	switch Type {
+	case 1:
+		RecordType = models.Text
+	case 2:
+		RecordType = models.Image
+	default:
+		c.JSON(http.StatusBadRequest, Response{
+			StatusCode: 400,
+			StatusMsg:  "Param error ",
+		})
+		return
+	}
+	messageRecord := models.MessageRecord{
+		Model:       gorm.Model{},
+		SenderUId:   SaveForm.UserId,
+		MessageType: RecordType,
+		Content:     SaveForm.Content,
+		TargetUId:   SaveForm.TargetId,
+	}
+	err = models.SaveMessageRecord(messageRecord)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, Response{
+			StatusCode: 500,
+			StatusMsg:  "Failed to save record!",
+		})
+	} else {
+		c.JSON(http.StatusOK, Response{
+			StatusCode: 200,
+			StatusMsg:  "Successfully save record!",
+		})
+	}
+}
