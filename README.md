@@ -39,4 +39,5 @@ mis项目后端仓库
 
 + cd到项目目录下
 + docker build -t mis .
-+ docker run -p 8000:8000 -dit -e TZ=Asia/Shanghai --name=MIS mis
++ docker run -dit -p 8000:8000 -v $PWD/RUNNING_logs:/build/runtime/logs -e TZ=Asia/Shanghai --name=MIS mis
++ 日志文件会生成在当前目录下 /RUNNING_logs 文件夹中
