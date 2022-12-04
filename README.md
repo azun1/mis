@@ -34,3 +34,9 @@ mis项目后端仓库
 - go.mod: 项目依赖
 - main.go: 项目入口
 - README.md: 项目说明
+
+### docker部署命令
+
++ cd到项目目录下
++ docker build -t mis .
++ docker run -p 8000:8000 -dit -e TZ=Asia/Shanghai --name=MIS mis

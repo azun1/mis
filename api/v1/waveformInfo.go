@@ -18,6 +18,7 @@ func AllMineHeartRate(c *gin.Context) {
 	}
 	for i := range filePaths {
 		// 使用Gin提供的文件下载服务
+		// TODO: 打包压缩再发送
 		c.File(filePaths[i])
 	}
 }
@@ -31,9 +32,18 @@ func AllMineBreathRate(c *gin.Context) {
 		api.ErrHandle(c, err)
 		return
 	}
+	if err != nil {
+		return
+	}
 	for i := range filePaths {
 		// 使用Gin提供的文件下载服务
-		c.File(filePaths[i])
+		// c.Header("Content-Type", "application/octet-stream")
+		// Means "I don't know what the hell this is. Please save it as a file, preferably named download.csv"
+		// Ref: https://stackoverflow.com/a/20509354
+		// c.Header("Content-Disposition", "attachment; filename=download.csv")
+		// c.File(filePaths[i])
+		// TODO: 打包压缩成一个文件再发送
+		c.FileAttachment(filePaths[i], "download"+string(i)+".csv")
 	}
 
 }

@@ -18,5 +18,7 @@ func UserRouter() {
 		user.DELETE("/delete", middleware.JWT(), v1.Delete)
 		// 更新用户信息
 		user.POST("/update", middleware.JWT(), v1.UpdateUserInfo)
+		// 获取用户信息
+		user.GET("/info", middleware.JWT(), v1.GetUserInfo)
 	}
 }
