@@ -82,6 +82,7 @@ func DelMessageRecord(userId, targetId string, createTime time.Time) error {
 	return nil
 }
 
+// SaveMessageRecord save record into database.
 func SaveMessageRecord(record MessageRecord) error {
 	err := db.Create(&record).Error
 	if err != nil {
