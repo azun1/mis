@@ -19,5 +19,11 @@ func WaveformInfoRouter() {
 
 		// <展示用> 获得最近的呼吸率数据 (10s)
 		waveformInfo.GET("/latest_breath_rate", middleware.JWT(), v1.LatestBreathRate)
+
+		// <展示用> 获得关联账号最近的心率数据
+		waveformInfo.POST("/related_latest_heart_rate", middleware.JWT(), v1.RelatedLatestHeartRate)
+
+		// <展示用> 获得关联账号最近的呼吸率数据
+		waveformInfo.POST("/related_latest_breath_rate", middleware.JWT(), v1.RelatedLatestBreathRate)
 	}
 }

@@ -21,7 +21,7 @@ func UserRelationshipRouter() {
 		userRelationship.GET("/related_account_list", middleware.JWT(), v1.GetRelatedAccList)
 
 		// 获取某个已关联账号的信息(关系类型, 备注)
-		userRelationship.GET("/related_account", middleware.JWT(), v1.GetRelatedAccount)
+		userRelationship.POST("/related_account", middleware.JWT(), v1.GetRelatedAccount)
 
 		// 设置某个已关联账号的信息(关系类型, 备注)
 		userRelationship.PUT("/related_account", middleware.JWT(), v1.SetRelatedAccount)
