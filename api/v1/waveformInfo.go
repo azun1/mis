@@ -3,8 +3,13 @@ package v1
 import (
 	"MIS/api"
 	"MIS/models"
+	"MIS/pkg/logging"
+	"MIS/pkg/settings"
+	"MIS/pkg/util"
 	"archive/zip"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"io"
 	"log"
 	"net/http"
@@ -13,7 +18,7 @@ import (
 )
 
 // 临时存放压缩文件的目录
-var archiveDirectory = "/home/healthy_bigdata/data/temp/"
+var archiveDirectory = settings.OssSettings.ArchiveDirectory
 
 // AllMineHeartRate 获得自己所有的心率数据
 func AllMineHeartRate(c *gin.Context) {
@@ -35,6 +40,12 @@ func AllMineHeartRate(c *gin.Context) {
 	// 发送压缩文件
 	c.FileAttachment(archivePath, "HeartRate.zip")
 
+	// 删除压缩文件
+	defer func() {
+		if err = os.Remove(archivePath); err != nil {
+			log.Fatalln(err)
+		}
+	}()
 }
 
 // AllMineBreathRate 获得自己的所有呼吸率数据
@@ -56,6 +67,13 @@ func AllMineBreathRate(c *gin.Context) {
 	}
 	// 发送压缩文件
 	c.FileAttachment(archivePath, "BreathRate.zip")
+
+	// 删除压缩文件
+	defer func() {
+		if err = os.Remove(archivePath); err != nil {
+			log.Fatalln(err)
+		}
+	}()
 }
 
 // LatestHeartRate 获得最近的心率数据 (10s)
@@ -75,6 +93,60 @@ func LatestHeartRate(c *gin.Context) {
 // LatestBreathRate 获得最近的呼吸率数据 (10s)
 func LatestBreathRate(c *gin.Context) {
 	var user = api.CurrentUser(c)
+	var desc = models.Description{
+		WaveformType: "BreathRate",
+	}
+	err := user.GetLatestRate(&desc)
+	if err != nil {
+		api.ErrHandle(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, desc)
+}
+
+// RelatedLatestHeartRate RelatedLatestBreathRate 获得关联账号最近的呼吸率数据
+func RelatedLatestHeartRate(c *gin.Context) {
+	// 获得要查询的uuid
+	uuidForm := struct {
+		Uuid string `json:"uuid" validate:"required"`
+	}{}
+	if !util.BindAndValid(c, &uuidForm) {
+		return
+	}
+	// 检查是否存在已经同意的关联性
+	if err := api.CurrentUser(c).CheckRelated(uuidForm.Uuid); errors.Is(err, gorm.ErrRecordNotFound) {
+		logging.Info("There is no confirmed connection between: %v and %v",
+			api.CurrentUser(c).Uuid, uuidForm.Uuid)
+		return
+	}
+	user, _ := models.FindUserByUuid(uuidForm.Uuid)
+	var desc = models.Description{
+		WaveformType: "HeartRate",
+	}
+	err := user.GetLatestRate(&desc)
+	if err != nil {
+		api.ErrHandle(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, desc)
+}
+
+// RelatedLatestBreathRate 获得关联账号最近的呼吸率数据
+func RelatedLatestBreathRate(c *gin.Context) {
+	// 获得要查询的uuid
+	uuidForm := struct {
+		Uuid string `json:"uuid" validate:"required"`
+	}{}
+	if !util.BindAndValid(c, &uuidForm) {
+		return
+	}
+	// 检查是否存在已经同意的关联性
+	if err := api.CurrentUser(c).CheckRelated(uuidForm.Uuid); errors.Is(err, gorm.ErrRecordNotFound) {
+		logging.Info("There is no confirmed connection between: %v and %v",
+			api.CurrentUser(c).Uuid, uuidForm.Uuid)
+		return
+	}
+	user, _ := models.FindUserByUuid(uuidForm.Uuid)
 	var desc = models.Description{
 		WaveformType: "BreathRate",
 	}

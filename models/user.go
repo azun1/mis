@@ -31,6 +31,16 @@ func FindUserByName(name string) (user User, err error) {
 	return
 }
 
+// FindUserByEmail 根据邮箱查找用户
+func FindUserByEmail(email string) (user User, err error) {
+	result := db.First(&user, "email = ?", email)
+	err = result.Error
+	if err != nil {
+		logging.Error("FindUserByEmail email: %v error: %v", email, err)
+	}
+	return
+}
+
 // IsUserNameExist 判断用户名称是否已存在
 func IsUserNameExist(name string) bool {
 	var user User

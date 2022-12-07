@@ -46,7 +46,7 @@ func ReadByLine(fp string, data *[][]string, n ...int) error {
 	if err != nil {
 		return err
 	}
-	// TODO: defer关闭文件时出错的处理程序
+
 	defer file.Close()
 
 	reader := csv.NewReader(file)
@@ -192,7 +192,7 @@ func (u *User) DownloadCSVByType(WaveformType string, fps *[]string) error {
 	var wfi []WaveformInfo
 	res := db.Where("user_uuid = ? AND wave_type = ?", u.Uuid, WaveformType).
 		Order("start_time desc").Find(&wfi)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+	if len(wfi) == 0 {
 		logging.Info("There is no such type waveform record for now")
 		return gorm.ErrRecordNotFound
 	}

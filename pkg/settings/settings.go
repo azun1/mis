@@ -3,6 +3,7 @@ package settings
 import (
 	"github.com/go-ini/ini"
 	"log"
+	"os"
 )
 
 // app.ini配置文件读取初始化模块
@@ -40,7 +41,8 @@ type DataBase struct {
 }
 
 type OssSetting struct {
-	Endpoint string
+	Endpoint         string
+	ArchiveDirectory string
 }
 
 type AliyunSetting struct {
@@ -68,6 +70,13 @@ func init() {
 	mapTo("database", DataBaseSettings)
 	mapTo("ossSetting", OssSettings)
 	mapTo("aliyunSetting", AliyunSettings)
+
+	// 创建存储文件夹
+	_, err = os.Stat(OssSettings.ArchiveDirectory)
+	if os.IsNotExist(err) {
+		// ModePerm: 最高权限，可读可写可执行
+		err = os.MkdirAll(OssSettings.ArchiveDirectory, os.ModePerm)
+	}
 }
 
 func mapTo(section string, v interface{}) {
