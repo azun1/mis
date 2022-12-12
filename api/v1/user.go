@@ -119,6 +119,16 @@ func UpdateUserInfo(context *gin.Context) {
 		return
 	}
 
+	// 判断用户名是否已存在
+	if models.IsUserNameExist(userForm.Username) {
+		code := -1
+		context.JSON(code, gin.H{
+			"code":    code,
+			"message": "该用户名已存在",
+		})
+		return
+	}
+
 	birthPointer := new(time.Time)
 	if userForm.Birth != "" {
 		ymd, err := util.DateStringToYMD(userForm.Birth)

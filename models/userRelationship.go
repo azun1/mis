@@ -167,13 +167,12 @@ func (u *User) GetRelatedList(confirmed *[]UserRelationship, unconfirmed *[]stri
 		u.Uuid, false).Find(&unconfirmedList)
 	if len(unconfirmedList) == 0 {
 		logging.Info("There is no connection record for now")
-		return gorm.ErrRecordNotFound
 	}
 	for i := range unconfirmedList {
 		*unconfirmed = append(*unconfirmed, unconfirmedList[i].SelfUuid)
 	}
 
-	res = db.Where("self_uuid = ?", u.Uuid).Find(confirmed)
+	res = db.Where("self_uuid = ? AND is_confirmed = ?", u.Uuid, true).Find(confirmed)
 
 	return res.Error
 }
