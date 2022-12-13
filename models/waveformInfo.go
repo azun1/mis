@@ -15,10 +15,10 @@ import (
 type WaveformInfo struct {
 	gorm.Model
 	// 联合索引遵循左前缀原则, priority 数值小的在左边(默认值为10), 相同则按在 struct 中的次序排
-	UserUuid  string    `json:"user_uuid" gorm:"default:'';not null;uniqueIndex:u&f_index,priority:1;uniqueIndex:u&w&f_index,priority:1"`
+	UserUuid  string    `json:"user_uuid" gorm:"type:char(36);default:'';not null;uniqueIndex:u&f_index,priority:1;uniqueIndex:u&w&f_index,priority:1"`
 	StartTime time.Time `json:"start_time" gorm:"type:timestamp;default:'2000-01-01 00:00:01';not null"`
 	EndTime   time.Time `json:"end_time" gorm:"type:timestamp;default:'2000-01-01 00:00:01';not null"`
-	WaveType  string    `json:"wave_type" gorm:"type:varchar(50);default:'';not null;uniqueIndex:u&w&f_index,priority:2;uniqueIndex:w&f_index,priority:1"`
+	WaveType  string    `json:"wave_type" gorm:"type:varchar(63);default:'';not null;uniqueIndex:u&w&f_index,priority:2;uniqueIndex:w&f_index,priority:1"`
 	FilePath  string    `json:"file_path" gorm:"type:varchar(500);default:'';not null;uniqueIndex:u&f_index,priority:2;uniqueIndex:u&w&f_index,priority:3;uniqueIndex:w&f_index,priority:2"`
 }
 
