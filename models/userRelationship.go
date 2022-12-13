@@ -10,10 +10,10 @@ import (
 type UserRelationship struct {
 	gorm.Model
 	// 联合索引遵循左前缀原则, priority 数值小的在左边(默认值为10), 相同则按在 struct 中的次序排
-	SelfUuid         string `json:"self_uuid" gorm:"default:'';not null;uniqueIndex:s&f_uuid_index,priority:1;uniqueIndex:f&s_uuid_index,priority:2"`
-	FamilyUuid       string `json:"family_uuid" gorm:"default:'';not null;uniqueIndex:s&f_uuid_index,priority:2;uniqueIndex:f&s_uuid_index,priority:1"`
-	RelationshipType string `json:"relationship_type" gorm:"default:'';not null"`
-	RelationshipInfo string `json:"relationship_info" gorm:"default:'';not null"`
+	SelfUuid         string `json:"self_uuid" gorm:"type:char(36);default:'';not null;uniqueIndex:s&f_uuid_index,priority:1;uniqueIndex:f&s_uuid_index,priority:2"`
+	FamilyUuid       string `json:"family_uuid" gorm:"type:char(36);default:'';not null;uniqueIndex:s&f_uuid_index,priority:2;uniqueIndex:f&s_uuid_index,priority:1"`
+	RelationshipType string `json:"relationship_type" gorm:"type:varchar(63);default:'';not null"`
+	RelationshipInfo string `json:"relationship_info" gorm:"type:varchar(63);default:'';not null"`
 	IsConfirmed      bool   `json:"is_confirmed" gorm:"type:tinyint(1);default:0;not null"`
 }
 

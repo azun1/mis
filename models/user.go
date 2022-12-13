@@ -8,11 +8,11 @@ import (
 
 type User struct {
 	gorm.Model
-	Uuid       string     `json:"uuid" gorm:"unique_index"`
-	Email      string     `json:"email"`
-	Name       string     `json:"username" gorm:"not null;unique_index"  validate:"required"`
+	Uuid       string     `json:"uuid" gorm:"type:char(36);not null;unique_index"`
+	Email      string     `json:"email" gorm:"type:varchar(254);unique_index"`
+	Name       string     `json:"username" gorm:"type:varchar(20);not null;unique_index"  validate:"required"`
 	Password   string     `json:"password" gorm:"not null"  validate:"required"`
-	RealName   string     `json:"realName"`
+	RealName   string     `json:"realName" gorm:"type:varchar(20);not null;default:''"`
 	Gender     string     `json:"gender"`                    // 性别
 	Birth      *time.Time `json:"birth" gorm:"default:NULL"` // 出生日期
 	Picture    string     `json:"picture"`
